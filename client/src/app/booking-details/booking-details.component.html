@@ -1,1 +1,9 @@
-//todo: complete missing code.
+<div *ngFor="let item of bookingDetails$ | async">
+    <p>Booking Information</p>
+    <p>Title  {{item.title}}</p>
+    <p>Description  {{item.description}}</p>
+    <p>Date Time  {{item.dateTime}}</p>
+    <p>Location  {{item.location}}</p>
+    <p>status  {{item.status}}</p>
+    <p>Allocation  {{item.quantity}}</p>
+</div>

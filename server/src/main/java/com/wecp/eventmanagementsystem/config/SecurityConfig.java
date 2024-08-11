@@ -3,6 +3,8 @@ package com.wecp.eventmanagementsystem.config;
 import com.wecp.eventmanagementsystem.jwt.JwtRequestFilter;
 import com.wecp.eventmanagementsystem.service.UserService;
 
+import javax.security.auth.message.callback.PrivateKeyCallback.Request;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.util.matcher.AnyRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -93,3 +97,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 // - any other route: accessible to authenticated users
 // configure the session management
 // add the jwtRequestFilter before the UsernamePasswordAuthenticationFilter
+
+
+
+// @Configuration  -->>> This is a Config file
+// @EnableWebSecurity --->>> this is a Customized file
+// public SecurityConfig {
+//         @Bean
+//         public SecurityFilterChain securityFilterChain(HttpSecurity http)
+//         {
+//               return http.build();              ->>> This basically returns object of securityFilterChain
+//               http.cors()       --->For Linking Spring and Angular
+//               .and()
+//               .csrf(customizer->customizer.disable())   --->So that Login Will be activated
+//               .authorizeHttpRequests(request -> request.anyRequest().authenticated())           -->>Only after Authentication
+//               .formLogin(Customizer.withDefaults())     --->For the Browser 
+//               .httpBasic(Customizer.withDefaults())     --->> For the ThunderClient
+              
+//               .sessionManagement(session-> SessionCreationPolicy(SessionCreationPolicy.STATELESS))      ->>>Making this Stateless for better security Purposes
+
+//         }
+// }

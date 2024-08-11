@@ -11,5 +11,8 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./view-events.component.scss']
 })
 export class ViewEventsComponent 
+{
+  
+}
   
 //todo: complete missing code..

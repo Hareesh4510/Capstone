@@ -1,1 +1,9 @@
-//todo: complete missing codel..
+<div>
+    <form [formGroup]="resourceForm" ngSubmit="onSubmit()">
+        <div>
+            <label for="name">Name</label>
+            <input type="text" id="name" formControlName="name" placeholder="name">
+            <div *ngIf="resourceForm.get('name')?.hasError('required') && resourceForm.get('name')?.touched">Name is Required</div>
+        </div>
+    </form>
+</div>
