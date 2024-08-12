@@ -1,10 +1,93 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
-import { AuthService } from '../../services/auth.service';
-import { HttpService } from '../../services/http.service';
+// import { Component, OnInit } from '@angular/core';
+// import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+// import { Router } from '@angular/router';
+// import { Observable } from 'rxjs';
+// // import { Observable, of } from 'rxjs';
+// // import { AuthService } from '../../services/auth.service';
+// import { HttpService } from '../../services/http.service';
 
+
+// @Component({
+//   selector: 'app-registration',
+//   templateUrl: './registration.component.html',
+//   styleUrls: ['./registration.component.scss']
+// })
+// export class RegistrationComponent implements OnInit {
+
+//   itemForm!: FormGroup;
+//   formModel: any = { role: null, email: '', password: '', username: '' };
+//   showMessage: boolean = false;
+//   responseMessage: any;
+//   // userError$: Observable<string> | undefined; // Observable for error messages
+//   // userSuccess$: Observable<string> | undefined;
+//   //todo: Complete missing code..
+
+//   usernamePattern = '^[a-z]+$';
+//   passwordPattern = '^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$';
+
+//   constructor(
+//     private formBuilder: FormBuilder,
+//     private bookService: HttpService,
+//     private router: Router
+//   ) {
+//     this.itemForm = this.formBuilder.group({
+//       username: ['', [Validators.required, Validators.pattern(this.usernamePattern)]],
+//       email: ['', [Validators.required, this.emailValidator]],
+//       password: ['', [Validators.required, Validators.pattern(this.passwordPattern)]],
+//       role: ['', [Validators.required]],
+//     });
+//   }
+
+//   ngOnInit(): void {
+
+//   }
+
+
+//   // hasSpecialCharacters(inputString:string):boolean {
+//   //   // Define a regular expression for special characters
+//   //   const specialCharactersRegex = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/;
+
+//   //   // Test if the inputString contains any special characters
+//   //   return specialCharactersRegex.test(inputString);
+//   // }
+
+//   emailValidator(control: AbstractControl): ValidationErrors | null {
+//     const emailRegex: RegExp = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+//     if (!emailRegex.test(control.value)) {
+//       return { invalidEmailFormat: true }
+//     }
+//     return null;
+//   }
+
+
+
+//   onRegister(): void {
+//     if (this.itemForm.valid) {
+//       this.bookService.registerUser(this.itemForm.value).subscribe(
+//         data => {
+//           this.showMessage = true;
+//           this.responseMessage = data.message;
+//           this.itemForm.reset();
+//           // this.userSuccess$ = data.message;
+//         },
+//         error => {
+//           this.showMessage = true;
+//           this.responseMessage = error.message;
+//           // this.userError$ =error.message;
+//         }
+//       );
+//     } else {
+//       this.itemForm.markAllAsTouched();
+//     }
+//   }
+// }
+
+
+import { Component, OnInit } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { HttpService } from '../../services/http.service';
 
 @Component({
   selector: 'app-registration',
@@ -12,81 +95,52 @@ import { HttpService } from '../../services/http.service';
   styleUrls: ['./registration.component.scss']
 })
 export class RegistrationComponent implements OnInit {
+  itemForm!: FormGroup;
+  formModel: any = { role: null, email: '', password: '', username: '' };
+  showMessage: boolean = false;
+  responseMessage: any;
+  usernamePattern = '^[a-z]+$';
+  passwordPattern = '^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$';
 
-  userForm!: FormGroup;
-  userError$: Observable<any[]>=of([]);
-  userSuccess$: Observable<any[]> =of([]);
-  isFormSubmitted: boolean = false;
-  errorMsg!:any;
-  constructor(private formBuilder: FormBuilder,private authServie: AuthService)
-   {
-
-   }
-
-  ngOnInit(): void {
-    this.userForm = this.formBuilder.group({
-      username: ["", [Validators.required]],
-      password: ["", [Validators.required]],
-      role: ["", [Validators.required]],
-      name: ["", [Validators.required]],
-      email: ["", [Validators.required]],
+  constructor(
+    private formBuilder: FormBuilder,
+    private bookService: HttpService,
+    private router: Router
+  ) {
+    this.itemForm = this.formBuilder.group({
+      username: ['', [Validators.required, Validators.pattern(this.usernamePattern)]],
+      email: ['', [Validators.required, this.emailValidator]],
+      password: ['', [Validators.required, Validators.pattern(this.passwordPattern)]],
+      role: ['', [Validators.required]],
     });
-    this.errorMsg="";
   }
-   hasSpecialCharacters(inputString:string):boolean {
-    // Define a regular expression for special characters
-    const specialCharactersRegex = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/;
-  
-    // Test if the inputString contains any special characters
-    return specialCharactersRegex.test(inputString);
-  }
-  onSubmit() {
-    this.isFormSubmitted = true;
-    this.userSuccess$ = of('');
-    this.userError$ = of('');
+
+  ngOnInit(): void {}
+
+  emailValidator(control: AbstractControl): ValidationErrors | null {
     const emailRegex: RegExp = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (!emailRegex.test(control.value)) {
+      return { invalidEmailFormat: true }
+    }
+    return null;
+  }
 
-    if (this.userForm.invalid) {
-      return;
-    } else {
-      const { username, password, role,email } = this.userForm.value;
-      if(password.length < 8)
-      {
-        this.userError$ = of("Password must be of 8 characters");
-        return;
-      }
-      if(this.hasSpecialCharacters(username))
-      {
-        this.userError$ = of("User Name must consist of letter and number only!!");
-        return;
-      }
-      console.log(emailRegex.test(email));
-      if(!emailRegex.test(email))
-      {
-        this.userError$ = of("Invalid Email Id!!");
-        return;
-
-      }
-
-      const customer: any = new User({
-        username,
-        password,
-        role,
-        email
-      });
-      
-      this.authServie.createUser(customer).subscribe(
-        (res: any) => {
-          this.userSuccess$ = of("User created successfully");
+  onRegister(): void {
+    if (this.itemForm.valid) {
+      this.bookService.registerUser(this.itemForm.value).subscribe(
+        data => {
+          this.showMessage = true;
+          this.responseMessage = data.message;
+          this.itemForm.reset();
         },
-        (error) => {
-          this.userError$ = of("User Alreay Exists:");
+        error => {
+          this.showMessage = true;
+          this.responseMessage = error.message;
         }
       );
+    } else {
+      this.itemForm.markAllAsTouched();
     }
   }
-
- //todo: Complete missing code..
-
-
 }
+

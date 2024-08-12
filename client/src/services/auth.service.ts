@@ -1,45 +1,52 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+// import { Injectable } from '@angular/core';
+
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class AuthService {
+  
+
+//   //todo: complete missing code..
+// }
+
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { environment } from '../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private token: string | null = null;
+  private isLoggedIn: boolean = false;
 
-  private loginUrl = `${environment.apiUrl}`;
+  constructor() { }
 
-
- httpOptions = {
-  headers: new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-  })
-};
-
-  constructor(private http: HttpClient) {}
-
-  login(user: Partial<any>): Observable<{ [key: string]: string }> {
-    return this.http.post<{ token: string }>(
-      `${this.loginUrl}/customer/login`,
-      user,
-      this.httpOptions
-    );
+  saveToken(token: string): void {
+    this.token = token;
+    this.isLoggedIn = true;
+    localStorage.setItem('token', token);
   }
 
-  getToken() {
-    return localStorage.getItem("token");
-  }
-  getRole()
-  {
-    return localStorage.getItem("role");
-  }
-  
-
-  createUser(user: any): Observable<any> {
-    return this.http.post<any>(`${this.loginUrl}/user/register`, user);
+  setRole(role: any): void {
+    localStorage.setItem('role', role);
   }
 
-  //todo: complete missing code..
+  get getRole(): string | null {
+    return localStorage.getItem('role');
+  }
+
+  get getLoginStatus(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  getToken(): string | null {
+    this.token = localStorage.getItem('token');
+    return this.token;
+  }
+
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    this.token = null;
+    this.isLoggedIn = false;
+  }
 }

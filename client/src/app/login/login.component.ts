@@ -1,61 +1,89 @@
+// import { Component, OnInit } from '@angular/core';
+// import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+// import { Router } from '@angular/router';
+// import { HttpService } from '../../services/http.service';
+// import { AuthService } from '../../services/auth.service';
+
+
+
+// @Component({
+//   selector: 'app-login',
+//   templateUrl: './login.component.html',
+//   styleUrls: ['./login.component.scss']
+// })
+// export class LoginComponent {
+
+// }
+//todo: complete missing code..
+
+
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpService } from '../../services/http.service';
 import { AuthService } from '../../services/auth.service';
-import { catchError, Observable, of, tap } from 'rxjs';
-
-
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit 
-{
-  loginForm!: FormGroup;
-  loginError$: Observable<{ [key: string]: string; }> | undefined;
+export class LoginComponent implements OnInit {
+  itemForm: FormGroup;
+  formModel: any = {};
+  showError: boolean = false;
+  errorMessage: any;
+
+  usernamePattern = '^[a-z]+$';
+  passwordPattern = '^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$';
 
   constructor(
+    private router: Router,
+    private httpService: HttpService,
     private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {}
-
-  ngOnInit(): void {
-    this.loginForm = this.formBuilder.group({
-      username: ["", [Validators.required]],
-      password: ["", Validators.required],
-     
+    private authService: AuthService
+  ) {
+    this.itemForm = this.formBuilder.group({
+      username: ['',[ Validators.required,  Validators.pattern(this.usernamePattern)]],
+      password: ['', [Validators.required, Validators.pattern(this.passwordPattern)]]
     });
   }
 
-  onSubmit(): void {
-    if (this.loginForm.invalid) {
-      this.loginError$ = of({
-        message: "Please make sure you have filled all the required fields",
-      });
-      return;
+  ngOnInit(): void {
+    // No specific actions are taken here.
+  }
+
+  onLogin() {
+    if (this.itemForm.valid) {
+      this.showError = false;
+      this.httpService.Login(this.itemForm.value).subscribe(
+        (data : any)=> {
+          this.authService.setRole(data.role);
+          this.authService.saveToken(data.token);
+          localStorage.setItem('token', data.token);
+          this.router.navigateByUrl('dashboard').then(() => {
+            window.location.reload();
+          });
+        },
+        error => {
+          if (error.status === 401) {
+            this.showError = true;
+            this.errorMessage = 'Incorrect username or password.';
+          } else {
+            this.showError = true;
+            this.errorMessage = 'An error occurred during the request.';
+          }
+        }
+      );
     } else {
-      const { username, password } = this.loginForm.value;
-      this.loginError$ = this.authService
-        .login({ username, password })
-        .pipe(
-          tap((response) => {
-            console.log(response);
-            localStorage.setItem("token", response.token);
-            localStorage.setItem("role",response.roles);
-            localStorage.setItem("user_id",response.userId);
-            console.log(localStorage.getItem("role"));
-            this.router.navigate(["bank"]);
-          }),
-          catchError((error) => {
-            console.error("Login error:", error);
-            return of({ message: "Login error:"+ error });
-          })
-        );
+      this.showError = true;
+      this.errorMessage = 'Form is not valid.';
+      this.itemForm.markAllAsTouched();
     }
   }
+
+  registration() {
+    this.router.navigate(['/registration']);
+  }
 }
-//todo: complete missing code..
+

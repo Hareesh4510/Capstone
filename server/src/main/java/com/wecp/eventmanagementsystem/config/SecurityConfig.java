@@ -6,6 +6,7 @@ import com.wecp.eventmanagementsystem.service.UserService;
 import javax.security.auth.message.callback.PrivateKeyCallback.Request;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.info.ProjectInfoProperties.Build;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -66,9 +68,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                 .antMatchers(HttpMethod.GET, "/api/client/booking-details/{eventId}").hasAuthority("CLIENT")
                                 .anyRequest().authenticated()
                                 .and()
-                                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-                http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                                .and()
+                                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         }
 
         @Bean
@@ -100,21 +102,46 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
 
-// @Configuration  -->>> This is a Config file
-// @EnableWebSecurity --->>> this is a Customized file
-// public SecurityConfig {
+// @Configuration  
+// @EnableWebSecurity 
+// @EnableGlobalMethodSecurity(prePostEnabled = true)
+// public class SecurityConfig {
+//         @Autowired
+//         private UserDetailsService userDetailsService;
+//         @Autowired
+//         private  PasswordEncoder passwordEncoder;
+//         @Autowired
+//         private  JwtRequestFilter jwtRequestFilter;
+        // @Bean
+        // public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+        // {
+        //         return config.getAuthenticationManager();
+        // }
 //         @Bean
-//         public SecurityFilterChain securityFilterChain(HttpSecurity http)
+//         public AuthenticationProvider authenticationProvider()
 //         {
-//               return http.build();              ->>> This basically returns object of securityFilterChain
-//               http.cors()       --->For Linking Spring and Angular
+//                 DaoAuthenticationProvider provider=new DaoAuthenticationProvider();
+//                 provider.setPasswordEncoder(passwordEncoder); 
+//                 provider.setUserDetailsService(userDetailsService);
+//                 return provider;
+//         }
+//         @Bean
+//         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
+//         {
+//         http
+//                .cors()       
 //               .and()
-//               .csrf(customizer->customizer.disable())   --->So that Login Will be activated
-//               .authorizeHttpRequests(request -> request.anyRequest().authenticated())           -->>Only after Authentication
-//               .formLogin(Customizer.withDefaults())     --->For the Browser 
-//               .httpBasic(Customizer.withDefaults())     --->> For the ThunderClient
+//               .csrf(customizer->customizer.disable())   
+//               .authorizeHttpRequests(request -> request.anyRequest().authenticated())
+                       
+//               .formLogin(Customizer.withDefaults())      
+//               .httpBasic(Customizer.withDefaults()) 
+//               .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//               http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+//               return http.build();
               
-//               .sessionManagement(session-> SessionCreationPolicy(SessionCreationPolicy.STATELESS))      ->>>Making this Stateless for better security Purposes
+              
+// //         }     
 
 //         }
 // }

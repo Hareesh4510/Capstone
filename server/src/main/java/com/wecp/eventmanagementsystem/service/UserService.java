@@ -3,6 +3,10 @@ package com.wecp.eventmanagementsystem.service;
 import com.wecp.eventmanagementsystem.entity.User;
 import com.wecp.eventmanagementsystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,13 +22,14 @@ public class UserService implements UserDetailsService {
     private UserRepository userRepository;
 
     @Autowired
-    private final PasswordEncoder passwordEncoder;
+    private  PasswordEncoder passwordEncoder;
+    
 
-    @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    // @Autowired
+    // public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    //     this.userRepository = userRepository;
+    //     this.passwordEncoder = passwordEncoder;
+    // }
 
     // public User registerUser(User user){
     // return userRepository.save(user);
@@ -32,17 +37,22 @@ public class UserService implements UserDetailsService {
 
     public User registerUser(User user) {
 
-        User oldUser = userRepository.findByUsername(user.getUsername());
-        if (oldUser != null) {
-            throw new RuntimeException("User name Is Unavailable: " + user.getUsername());
+        // User oldUser = userRepository.findByUsername(user.getUsername());
+        // if (oldUser != null) {
+        //     throw new RuntimeException("User name Is Unavailable: " + user.getUsername());
 
-        }
+        // }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         return userRepository.save(user);
     }
 
     public User loginUser(String username, String password) {
+        // Authentication authentication= authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        // if(authentication.isAuthenticated())
+        // {
+        //     return user
+        // }
         User user = userRepository.findByUsername(username);
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             return user;
