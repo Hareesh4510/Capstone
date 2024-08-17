@@ -18,9 +18,23 @@ public class EventService {
     public List<Event> getAllEvents(){
         return eventRepository.findAll();
     }
+    public List<Event> GetAlleventsforClient(){
+        return eventRepository.findAll();
+    }
 
     public Event getEventsById(Long id) {
         Event e = eventRepository.findById(id).orElse(null);
+        if(e == null){
+            throw new EntityNotFoundException("Event not found!");
+        }
+        else{
+            return e;
+        }
+        
+    }
+
+    public Event getEventsByTitle(String  title) {
+        Event e = eventRepository.findByTitle(title);
         if(e == null){
             throw new EntityNotFoundException("Event not found!");
         }

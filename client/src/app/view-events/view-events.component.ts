@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpService } from '../../services/http.service';
 import { AuthService } from '../../services/auth.service';
-import { catchError, map, Observable, of, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-view-events',
@@ -11,159 +10,154 @@ import { catchError, map, Observable, of, throwError } from 'rxjs';
   styleUrls: ['./view-events.component.scss']
 })
 export class ViewEventsComponent implements OnInit {
-
-  //   itemForm!:FormGroup;
-  //   formModel:any={status:null};
-  //   showError:boolean=false;
-  //   errorMessage:any;
-  //   eventObj:any=[];
-  //   assignModel: any={};
-  //   showMessage: any;
-  //   responseMessage: any;
-  //   isUpdate: any=false;
-
-  //   constructor(private httpService:HttpService,private formBuilder:FormBuilder,
-  //     private router:Router,private authService: AuthService ){
-  //       this.itemForm = this.formBuilder.group({
-  //         title: ["", [Validators.required]],
-  //         description: ["", [Validators.required]],
-  //         dateTime: ["", [Validators.required]],
-  //         location: ["", [Validators.required]],
-  //         status: ["", [Validators.required]],
-  //       });
-  //     }
-
-  //   ngOnInit(): void {
-  //     // this.searchEvent();
-
-  //   }
-
-  //   onSubmit() {
-  //     // if(this.itemForm.invalid){
-  //     //   this.httpService.updateEvent(this.itemForm.value.eventId,this.itemForm.value.details).subscribe((res)=>{
-  //     //     this.router.navigateByUrl(`booking-details`);
-  //     //   });
-  //     // }
-  //   }
-
-
-  //   // GetEventdetails(eventId:any){
-  // //     this.event$ = this.httpservice.GetEventdetails(eventId);
-  // //      this.filteredEvent$ = this.event$;
-  // //      if(this.filteredEvent$){
-  // //      this.filteredEvent$.pipe(toArray());
-  // //      let eventArray;
-  // //      this.filteredEvent$.subscribe(eve => {
-  // //      eventArray = eve;
-  // //      if (eventArray) {
-  // //       const Array = JSON.stringify(eventArray);
-  // //       localStorage.setItem('EventData', Array);
-  // //     }
-  // //  });
-  // //      }
-  //   // }
-
-  //   searchEvent() {
-  //     // if (this.formModel.eventID) {
-  //     //   this.httpService.getEventDetails(this.formModel.eventID).subscribe(
-  //     //     data => {
-  //     //       this.eventObj = data;
-  //     //     },
-  //     //     error => {
-  //     //       this.errorMessage = error;
-  //     //       this.showError = true;
-  //     //       // console.log('Error:', error);
-  //     //     }
-  //     //   );
-  //     // }
-  //   }
-
-  //   // searchEvent() {
-
-  //     // const searchT =  this.formModel.value;
-  //     // if(!searchT){
-  //     //   this.e
-  //     // }
-  //     // const searchTerm =  this.formModel.eventId;
-  //     // if (!searchTerm) {
-  //     //   this.eventObj = this.httpService.updateEvent();
-  //     //   return;
-  //     // }
-  //     // // this.eventObj = this.httpService..pipe(
-  //     //   map((events) => events.filter((event) =>
-  //     //         event.eventId.toString().includes(searchTerm)
-  //     //     )),
-  //     //     catchError((error) => {
-  //     //       this.showError = true;
-  //     //       this.errorMessage = error.message;
-  //     //       return throwError(error);
-  //     //     }));
-  //   // }
-
-  //   }
-
-
-
   itemForm!: FormGroup;
-  formModel: any = { status: null };
   showError: boolean = false;
-  errorMessage: any;
-  eventObj: any = [];
-  assignModel: any = {};
-  showMessage: any;
-  responseMessage: any;
-  isUpdate: any = false;
+  errorMessage: string = '';
+  eventObj: any;
+  showMessage: boolean = false;
+  responseMessage: string = '';
+  isUpdate: boolean = false;
+  eventList: any[] = [];
 
-  constructor(private httpService: HttpService, private formBuilder: FormBuilder,
-    private router: Router, private authService: AuthService) {
+  constructor(
+    private httpService: HttpService,
+    private formBuilder: FormBuilder,
+    private router: Router,
+    private authService: AuthService
+  ) { }
+
+  ngOnInit(): void {
+    this.initForm();
+    this.getEvents();
+   
+  }
+
+  initForm(): void {
     this.itemForm = this.formBuilder.group({
-      title: ["", [Validators.required]],
-      description: ["", [Validators.required]],
-      dateTime: ["", [Validators.required]],
-      location: ["", [Validators.required]],
-      status: ["", [Validators.required]],
+      searchTerm: [''],
+      searchTitle: [''],
+      title: ['', Validators.required],
+      description: ['', Validators.required],
+      dateTime: ['', Validators.required],
+      location: ['', Validators.required],
+      status: ['', Validators.required]
     });
   }
 
-  ngOnInit(): void { }
-
-  searchEvent() {
-    const searchTerm = this.formModel.eventId;
-    if (searchTerm) {
-      this.httpService.GetEventdetails(searchTerm).subscribe(data => {
-        this.eventObj = data;
+  getEvents() {
+    this.httpService.GetEvents().subscribe(
+      (data) => {
+        this.eventList = data;
       },
-        error => {
-          this.errorMessage = error;
+      error => {
+        this.showError = true;
+        this.errorMessage = error.message || 'Failed to load events';
+      }
+    );
+  }
+
+  
+  
+
+  searchEvent(): void {
+    const searchTerm = this.itemForm.get('searchTerm')?.value;
+    if (searchTerm) {
+      this.httpService.GetEventdetails(searchTerm).subscribe(
+        (response) => {
+          this.errorMessage = '';
+          if (response.length !== 0) {
+            console.log(response);
+            this.eventObj = response;
+            this.showMessage = true;
+            this.responseMessage = 'Event found';
+            this.showError = false;
+            this.eventList = [response]; // Update eventList with search result
+          } else {
+            this.responseMessage = '';
+            this.showMessage = false;
+            this.showError = true;
+            this.errorMessage = 'Failed to find event';
+            console.error('Error searching event:', response);
+          }
+        },
+        (error) => {
           this.showError = true;
-        });
+          this.errorMessage = 'Failed to find event';
+          console.error('Error searching event:', error);
+        }
+      );
+    } else {
+      this.itemForm.get('searchTerm')?.markAsTouched();
     }
+  }
+
+  
+
+  sortByTitle(): void {
+    this.eventList.sort((a, b) => a.title.localeCompare(b.title));
   }
 
   onSubmit() {
     if (this.itemForm.valid) {
-      this.httpService.updateEvent(this.itemForm.value.eventId, this.itemForm.value.details).subscribe(
-        response => {
-          this.isUpdate = true;
-          this.formModel.reset();
-          this.responseMessage = 'Event updated successfully.';
-          this.showMessage(this.responseMessage);
-        },
-        error => {
-          this.showError = true;
-          this.errorMessage = 'An error occurred while updating the event.';
-          this.showMessage(this.errorMessage);
-        });
+      const eventData = this.itemForm.value;
+      if (this.isUpdate && this.eventObj) {
+        const updateData = {
+          title: eventData.title,
+          description: eventData.description,
+          dateTime: eventData.dateTime,
+          location: eventData.location,
+          status: eventData.status
+        };
+        this.httpService.updateEvent(updateData, this.eventObj.eventID).subscribe(
+          response => {
+            this.showMessage = true;
+            this.responseMessage = 'Event updated successfully.';
+            this.getEvents();
+            this.resetForm();
+          },
+          (error) => {
+            this.showError = true;
+            this.errorMessage = 'An error occurred while updating the event: ' + error.message;
+          }
+        );
+      } else {
+        this.httpService.createEvent(eventData).subscribe(
+          response => {
+            this.showMessage = true;
+            this.responseMessage = 'Event created successfully.';
+            this.getEvents();
+            this.resetForm();
+          },
+          (error) => {
+            this.showError = true;
+            this.errorMessage = 'An error occurred while creating the event: ' + error.message;
+          }
+        );
+      }
     } else {
-      // If the form is not valid
       this.showError = true;
-      this.errorMessage = 'Please correct the errors in the form.';
+      this.errorMessage = 'Please fill all required fields.';
+      this.itemForm.markAllAsTouched();
     }
   }
 
   edit(val: any) {
-    this.itemForm.patchValue(val);
-    this.itemForm.controls['dateTime'].setValue(new Date(val.dateTime).toISOString().substring(0, 16));
     this.isUpdate = true;
+    this.eventObj = val;
+    this.itemForm.patchValue({
+      title: val.title,
+      description: val.description,
+      dateTime: new Date(val.dateTime).toISOString().slice(0, 16),
+      location: val.location,
+      status: val.status
+    });
+  }
+
+  resetForm(): void {
+    this.isUpdate = false;
+    this.itemForm.reset();
+    this.eventObj = null;
+    this.showError = false;
+    this.showMessage = false;
   }
 }

@@ -20,6 +20,12 @@ public class StaffController {
         return new ResponseEntity<Event>(eventService.getEventsById(eventId), HttpStatus.OK);
     }
 
+    @GetMapping("/api/staff/event-detailsbyTitle/{title}")
+    public ResponseEntity<Event> getEventsByTitle(@PathVariable String title) {
+        // get the event details by eventId and return the event with status code 200 ok
+        return new ResponseEntity<Event>(eventService.getEventsByTitle(title), HttpStatus.OK);
+    }
+
     @PutMapping("/api/staff/update-setup/{eventId}")
     public ResponseEntity<Event> updateEventSetup(@PathVariable Long eventId, @RequestBody Event updatedEvent) {
         // update the event setup and return the updated event with status code 200 ok

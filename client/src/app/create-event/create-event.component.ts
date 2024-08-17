@@ -1,76 +1,3 @@
-// import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-// import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-// import { Router } from '@angular/router';
-// import { HttpService } from '../../services/http.service';
-// import { AuthService } from '../../services/auth.service';
-
-
-// @Component({
-//   selector: 'app-create-event',
-//   templateUrl: './create-event.component.html',
-//   styleUrls: ['./create-event.component.scss']
-// })
-// export class CreateEventComponent implements OnInit {
-
-//   @Output() addEvent = new EventEmitter<Event>();
-
-//   itemForm!: FormGroup;
-//   showError: boolean = false;
-//   errorMessage: any;
-//   eventList: any = [];
-//   assignModel: any = {};
-//   showMessage: any;
-//   responseMessage: any;
-
-//   constructor(private formBuilder: FormBuilder, private httpService: HttpService, private router: Router, private authService: AuthService) {
-//     this.itemForm = this.formBuilder.group({
-//       title: ["", Validators.required],
-//       description: ["", Validators.required],
-//       dateTime: ['', Validators.required],
-//       location: ["", Validators.required],
-//       status: ["", Validators.required],
-//     });
-//   }
-
-//   ngOnInit(): void {
-//     this.getEvent();
-//   }
-//   getEvent() {
-//     this.httpService.GetAllevents().subscribe((data: any) => {
-//       this.eventList = data;
-//     },
-//       (error) => {
-//         this.showError = true;
-//         this.errorMessage = "Unable to create Event";
-//         console.log(this.errorMessage);
-//       });
-//   }
-
-//   onSubmit() {
-//     if (this.itemForm.valid) {
-//       this.httpService.createEvent(this.itemForm.value).subscribe(
-//         data => {
-//           this.itemForm.reset();
-//           this.getEvent();
-//         },
-//         error => {
-//           this.showError = true;
-//           this.errorMessage = error;
-//           // console.log(this.errorMessage);
-//         }
-//       );
-//     }
-//     else {
-//       this.itemForm.markAllAsTouched();
-//     }
-//   }
-
-  
-// }
-// //doto: complete missing code..
-
-
-
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -84,9 +11,12 @@ import { AuthService } from '../../services/auth.service';
 })
 export class CreateEventComponent implements OnInit {
   itemForm: FormGroup;
-  formModel:any = {status:null};
-  showError:boolean = false;
-  errorMessage:any;
+  formModel: any = { status: null };
+  showError: boolean = false;
+  errorMessage: any;
+  eventList: any[] = [];
+  showMessage: boolean = false;
+  responseMessage: string = '';
 
   constructor(
     private router: Router,
@@ -105,6 +35,19 @@ export class CreateEventComponent implements OnInit {
 
   ngOnInit(): void {
     // Add your initialization logic here
+    this.getEvents();
+  }
+
+  getEvents() {
+    this.httpService.GetAllevents().subscribe(
+      data => {
+        this.eventList = data;
+      },
+      error => {
+        this.errorMessage = error.message || 'Failed to load events';
+        this.showError = true;
+      }
+    );
   }
 
   onSubmit() {
@@ -112,7 +55,12 @@ export class CreateEventComponent implements OnInit {
       this.httpService.createEvent(this.itemForm.value).subscribe(
         data => {
           // Handle success
-           console.log('Event created:', data);
+          alert('Event created successfully')
+          console.log('Event created:', data);
+          this.responseMessage = data;
+          this.showMessage = true;
+          this.itemForm.reset();
+          this.getEvents();
         },
         error => {
           this.errorMessage = error;

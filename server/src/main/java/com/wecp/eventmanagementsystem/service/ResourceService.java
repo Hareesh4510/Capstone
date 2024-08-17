@@ -15,8 +15,7 @@ import java.util.List;
 @Service
 public class ResourceService {
 
-  @Autowired
-  private AllocationRepository allocationRepository;
+  
 
   @Autowired
   private ResourceRepository resourceRepository;
@@ -32,15 +31,6 @@ public class ResourceService {
     return resourceRepository.findAll();
   }
 
-  // public void allocateResources(Long eventId, Long resourceId, Allocation allocation) {
-  //   Event event = eventRepository.findById(eventId)
-  //       .orElseThrow(() -> new EntityNotFoundException("Event not found"));
-  //   Resource resource = resourceRepository.findById(resourceId)
-  //       .orElseThrow(() -> new EntityNotFoundException("Resource not found"));
-  //   allocation.setEvent(event);
-  //   allocation.setResource(resource);
-  //   allocationRepository.save(allocation);
-  // }
 
   public void allocateResources(Long eventId, Long resourceId, Allocation allocation) {
     Event event = eventRepository.findById(eventId)

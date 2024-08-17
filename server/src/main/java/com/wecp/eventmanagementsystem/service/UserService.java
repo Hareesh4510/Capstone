@@ -2,6 +2,9 @@ package com.wecp.eventmanagementsystem.service;
 
 import com.wecp.eventmanagementsystem.entity.User;
 import com.wecp.eventmanagementsystem.repository.UserRepository;
+
+import Exception.UserExistsException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,33 +22,36 @@ import java.util.ArrayList;
 public class UserService implements UserDetailsService {
 
     @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    private  PasswordEncoder passwordEncoder;
+    private final  PasswordEncoder passwordEncoder;
     
 
-    // @Autowired
-    // public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-    //     this.userRepository = userRepository;
-    //     this.passwordEncoder = passwordEncoder;
-    // }
+    @Autowired
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-    // public User registerUser(User user){
-    // return userRepository.save(user);
-    // }
+   
 
     public User registerUser(User user) {
+        if ((userRepository.existsByUsername(user.getUsername())) && (userRepository.existsByEmail(user.getEmail()))){
+            throw new UserExistsException("User alreay exists! Please try another username and Email");}
 
-        // User oldUser = userRepository.findByUsername(user.getUsername());
-        // if (oldUser != null) {
-        //     throw new RuntimeException("User name Is Unavailable: " + user.getUsername());
-
-        // }
+       
+ else if(userRepository.existsByEmail(user.getEmail())){
+    throw new UserExistsException("User alreay exists! Please try another email.");
+}else if (userRepository.existsByUsername(user.getUsername())){
+    throw new UserExistsException("User alreay exists! Please try another username.");}
+     
+else{
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         return userRepository.save(user);
     }
+}
 
     public User loginUser(String username, String password) {
         // Authentication authentication= authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));

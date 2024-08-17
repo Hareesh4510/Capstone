@@ -29,10 +29,10 @@ public class JwtUtil {
 
     public String generateToken(String username) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + expiration * 1000);
+        Date expiryDate = new Date(now.getTime() + expiration *1000);
         User user = userRepository.findByUsername(username);
 
-        Map<String, Object> claims = new HashMap<>();
+        Map<String, Object> claims = new HashMap<>();  
         claims.put("sub", username);
 
         // Assign role based on user type

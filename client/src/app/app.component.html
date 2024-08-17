@@ -1,40 +1,573 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-  <a class="navbar-brand" href="#">Angular Event Managment System </a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
-    aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="roleName === 'PLANNER'" [routerLink]="['/create-event']">Create Event</a>
-        <a class="nav-link" *ngIf="roleName === 'PLANNER'" [routerLink]="['/add-resource']">Add Resources</a>
-        <a class="nav-link" *ngIf="roleName === 'PLANNER'" [routerLink]="['/resource-allocate']">Resource Allocate</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="roleName === 'CLIENT'" [routerLink]="['/booking-details']">Booking Details</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="roleName === 'STAFF'" [routerLink]="['/view-events']">View Events</a>
-      </li>
-    </ul>
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angular Event Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0082e6;
+            --secondary-color: #0f86e1;
+            --text-color: #000000;
+        }
 
-    <!-- Login/Logout buttons -->
-    <ul class="navbar-nav">
-      <li *ngIf="!IsLoggin" class="nav-item">
-        <a class="nav-link" [routerLink]="['/login']">Login</a>
-      </li>
-      <li *ngIf="IsLoggin" class="nav-item">
-        <a class="nav-link" (click)="logout()" [routerLink]="['/login']">Logout</a>
-      </li>
-    </ul>
-  </div>
-</nav>
+        body {
+            font-family: 'Open Sans', sans-serif;
+        }
 
+        .navbar {
+            background-color: var(--primary-color);
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-brand {
+            color: var(--text-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand img {
+            height: 150px; /* Increased from 40px to 60px */
+            margin-right: 15px;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-color);
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            background-color: var(--secondary-color);
+        }
+
+        .navbar-toggler {
+            border-color: var(--text-color);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .btn-login,
+        .btn-register {
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            margin-left: 0.5rem;
+        }
+
+        .btn-login:hover,
+        .btn-register:hover {
+            background-color: var(--text-color);
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-nav {
+                background-color: var(--primary-color);
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
 <body>
-  <div class="container mt-4 mx-5">
-    <router-outlet>
-    </router-outlet>
-  </div>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="assets/prilogo.png" alt="Logo"> 
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item" *ngIf="roleName === 'PLANNER'">
+                        <a class="nav-link" [routerLink]="['/create-event']">
+                            <i class="bi bi-calendar-plus"></i> Create Event
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'PLANNER'">
+                        <a class="nav-link" [routerLink]="['/add-resource']">
+                            <i class="bi bi-plus-circle"></i> Add Resources
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'PLANNER'">
+                        <a class="nav-link" [routerLink]="['/resource-allocate']">
+                            <i class="bi bi-diagram-3"></i> Resource Allocate
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'CLIENT'">
+                        <a class="nav-link" [routerLink]="['/booking-details']">
+                            <i class="bi bi-book"></i> Booking Details
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'STAFF'">
+                        <a class="nav-link" [routerLink]="['/view-events']">
+                            <i class="bi bi-eye"></i> View Events
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button class="btn btn-login" *ngIf="!IsLoggin" [routerLink]="['/login']">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </button>
+                    <button class="btn btn-register" *ngIf="!IsLoggin" [routerLink]="['/register']">
+                        <i class="bi bi-person-plus"></i> Register
+                    </button>
+                    <button class="btn btn-login" *ngIf="IsLoggin" (click)="logout()" [routerLink]="['/login']">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
+    <div class="container mt-4">
+        <router-outlet></router-outlet>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+</html> -->
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angular Event Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0082e6;
+            --secondary-color: #0f86e1;
+            --text-color: #000000;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            padding-top: 80px; /* Added to account for fixed navbar */
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            background-color: #ddddff6d;
+            padding: 0.5rem 1rem;
+            position: fixed; /* Make navbar fixed */
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030; /* Ensure navbar stays on top */
+        }
+
+        .navbar-brand {
+            color: var(--text-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand img {
+            height: 100px; /* Adjusted from 150px to 60px for better proportions */
+            margin-right: 15px;
+            margin: -20px ;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-color);
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            background-color: var(--secondary-color);
+        }
+
+        .navbar-toggler {
+            border-color: var(--text-color);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .btn-login,
+        .btn-register {
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            margin-left: 0.5rem;
+        }
+
+        .btn-login:hover,
+        .btn-register:hover {
+            background-color: var(--text-color);
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-nav {
+                background-color: var(--primary-color);
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="assets/prilogo.png" alt="Logo"> 
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item" *ngIf="roleName === 'PLANNER'">
+                        <a class="nav-link" [routerLink]="['/create-event']">
+                            <i class="bi bi-calendar-plus"></i> Create Event
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'PLANNER'">
+                        <a class="nav-link" [routerLink]="['/add-resource']">
+                            <i class="bi bi-plus-circle"></i> Add Resources
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'PLANNER'">
+                        <a class="nav-link" [routerLink]="['/resource-allocate']">
+                            <i class="bi bi-diagram-3"></i> Resource Allocate
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'CLIENT'">
+                        <a class="nav-link" [routerLink]="['/booking-details']">
+                            <i class="bi bi-book"></i> Booking Details
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'STAFF'">
+                        <a class="nav-link" [routerLink]="['/view-events']">
+                            <i class="bi bi-eye"></i> View Events
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button class="btn btn-login" *ngIf="!IsLoggin" [routerLink]="['/login']">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </button>
+                    <button class="btn btn-register" *ngIf="!IsLoggin" [routerLink]="['/register']">
+                        <i class="bi bi-person-plus"></i> Register
+                    </button>
+                    <button class="btn btn-login" *ngIf="IsLoggin" (click)="logout()" [routerLink]="['/login']">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <router-outlet></router-outlet>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> -->
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angular Event Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0082e6;
+            --secondary-color: #0f86e1;
+            --text-color: #000000;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-brand {
+            color: var(--text-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand img {
+            height: 150px; /* Increased from 40px to 60px */
+            margin-right: 15px;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-color);
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            background-color: var(--secondary-color);
+        }
+
+        .navbar-toggler {
+            border-color: var(--text-color);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .btn-login,
+        .btn-register {
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            margin-left: 0.5rem;
+        }
+
+        .btn-login:hover,
+        .btn-register:hover {
+            background-color: var(--text-color);
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-nav {
+                background-color: var(--primary-color);
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="assets/prilogo.png" alt="Logo"> 
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item" *ngIf="roleName === 'PLANNER'">
+                        <a class="nav-link" [routerLink]="['/create-event']">
+                            <i class="bi bi-calendar-plus"></i> Create Event
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'PLANNER'">
+                        <a class="nav-link" [routerLink]="['/add-resource']">
+                            <i class="bi bi-plus-circle"></i> Add Resources
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'PLANNER'">
+                        <a class="nav-link" [routerLink]="['/resource-allocate']">
+                            <i class="bi bi-diagram-3"></i> Resource Allocate
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'CLIENT'">
+                        <a class="nav-link" [routerLink]="['/booking-details']">
+                            <i class="bi bi-book"></i> Booking Details
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'STAFF'">
+                        <a class="nav-link" [routerLink]="['/view-events']">
+                            <i class="bi bi-eye"></i> View Events
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button class="btn btn-login" *ngIf="!IsLoggin" [routerLink]="['/login']">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </button>
+                    <button class="btn btn-register" *ngIf="!IsLoggin" [routerLink]="['/register']">
+                        <i class="bi bi-person-plus"></i> Register
+                    </button>
+                    <button class="btn btn-login" *ngIf="IsLoggin" (click)="logout()" [routerLink]="['/login']">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <router-outlet></router-outlet>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angular Event Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #D2B48C; /* Sandal color */
+            --secondary-color: #ffffff; /* White */
+            --text-color: #000000; /* Dark text */
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            padding-top: 80px; /* Added to account for fixed navbar */
+            background-color: var(--secondary-color); /* White background */
+        }
+
+        .navbar {
+            background-color: var(--primary-color); /* Sandal background */
+            padding: 0.5rem 1rem;
+            position: fixed; /* Make navbar fixed */
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030; /* Ensure navbar stays on top */
+            border-bottom: 2px solid black; /* Black border line */
+        }
+
+        .navbar-brand {
+            color: var(--text-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand img {
+            height: 60px; /* Adjusted for better proportions */
+            margin-right: 15px;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-color);
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            background-color: var(--secondary-color); /* White background on hover */
+        }
+
+        .navbar-toggler {
+            border-color: var(--text-color);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0, 0, 0, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .btn-login,
+        .btn-register {
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            margin-left: 0.5rem;
+        }
+
+        .btn-login:hover,
+        .btn-register:hover {
+            background-color: var(--text-color);
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-nav {
+                background-color: var(--primary-color);
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="assets/prilogo.png" alt="Logo"> 
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item" *ngIf="roleName === 'PLANNER'">
+                        <a class="nav-link" [routerLink]="['/create-event']">
+                            <i class="bi bi-calendar-plus"></i> Create Event
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'PLANNER'">
+                        <a class="nav-link" [routerLink]="['/add-resource']">
+                            <i class="bi bi-plus-circle"></i> Add Resources
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'PLANNER'">
+                        <a class="nav-link" [routerLink]="['/resource-allocate']">
+                            <i class="bi bi-diagram-3"></i> Resource Allocate
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'CLIENT'">
+                        <a class="nav-link" [routerLink]="['/booking-details']">
+                            <i class="bi bi-book"></i> Booking Details
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="roleName === 'STAFF'">
+                        <a class="nav-link" [routerLink]="['/view-events']">
+                            <i class="bi bi-eye"></i> View Events
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button class="btn btn-login" *ngIf="!IsLoggin" [routerLink]="['/login']">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </button>
+                    <button class="btn btn-register" *ngIf="!IsLoggin" [routerLink]="['/register']">
+                        <i class="bi bi-person-plus"></i> Register
+                    </button>
+                    <button class="btn btn-login" *ngIf="IsLoggin" (click)="logout()" [routerLink]="['/login']">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <router-outlet></router-outlet>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
